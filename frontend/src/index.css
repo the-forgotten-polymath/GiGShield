@@ -1,0 +1,98 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    @apply bg-dark text-slate-100 font-sans antialiased;
+    min-height: 100dvh;
+  }
+
+  :root {
+    --brand: theme('colors.brand.500');
+  }
+}
+
+@layer components {
+  /* Card Glassmorphism */
+  .gs-card {
+    @apply bg-dark-card border border-dark-border rounded-2xl p-5 shadow-xl;
+    background: linear-gradient(145deg, rgba(30,41,59,0.95) 0%, rgba(15,23,42,0.98) 100%);
+  }
+
+  /* Badge variants */
+  .gs-badge-active {
+    @apply inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full
+           bg-brand-500/20 text-brand-300 border border-brand-500/30;
+  }
+  .gs-badge-tier-lite     { @apply inline-flex items-center gap-1 text-xs font-bold px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/30; }
+  .gs-badge-tier-standard { @apply inline-flex items-center gap-1 text-xs font-bold px-2 py-0.5 rounded-full bg-brand-500/20 text-brand-300 border border-brand-500/30; }
+  .gs-badge-tier-pro      { @apply inline-flex items-center gap-1 text-xs font-bold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30; }
+
+  /* Primary button */
+  .gs-btn {
+    @apply w-full py-4 px-6 rounded-2xl font-bold text-base tracking-wide
+           bg-brand-500 text-dark hover:bg-brand-400 active:scale-95
+           transition-all duration-200 flex items-center justify-center gap-2 shadow-lg;
+    box-shadow: 0 4px 24px rgba(20, 184, 166, 0.35);
+  }
+  .gs-btn:disabled { @apply opacity-50 cursor-not-allowed active:scale-100; }
+
+  /* Secondary button */
+  .gs-btn-ghost {
+    @apply w-full py-3.5 px-6 rounded-2xl font-semibold text-sm
+           border border-dark-border text-slate-300 hover:bg-dark-card
+           transition-all duration-200 flex items-center justify-center gap-2;
+  }
+
+  /* Input */
+  .gs-input {
+    @apply w-full py-3.5 px-4 rounded-xl bg-dark-card border border-dark-border
+           text-slate-100 placeholder-dark-muted text-base
+           focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500/50
+           transition-colors duration-150;
+  }
+
+  /* Alert banner */
+  .gs-alert-disruption {
+    @apply flex items-start gap-3 p-4 rounded-xl border
+           bg-red-500/10 border-red-500/30 text-red-300;
+  }
+
+  /* Bottom nav */
+  .gs-nav { @apply fixed bottom-0 left-0 right-0 bg-dark-card border-t border-dark-border flex safe-bottom; }
+  .gs-nav-item {
+    @apply flex-1 flex flex-col items-center justify-center py-3 gap-1
+           text-xs text-dark-muted transition-colors;
+  }
+  .gs-nav-item.active { @apply text-brand-400; }
+
+  /* Payout card */
+  .gs-payout-card {
+    @apply flex items-center gap-4 p-4 rounded-xl border border-dark-border bg-dark hover:border-brand-500/40 transition-colors;
+  }
+
+  /* Safe area bottom */
+  .safe-bottom { padding-bottom: env(safe-area-inset-bottom, 0px); }
+}
+
+/* Page transitions */
+.page-enter { @apply animate-fade-in; }
+
+/* Shimmer loading */
+.shimmer {
+  background: linear-gradient(90deg, #1e293b 25%, #334155 50%, #1e293b 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* Shield glow effect */
+.shield-glow {
+  filter: drop-shadow(0 0 20px rgba(20, 184, 166, 0.5));
+}
