@@ -1,0 +1,99 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: gigshield_postgres
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: gigshield
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: gigshield
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U gigshield"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: gigshield_redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+    container_name: gigshield_backend
+    restart: unless-stopped
+    ports:
+      - "3001:3001"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      ml-service:
+        condition: service_started
+    env_file:
+      - ../.env
+    environment:
+      DATABASE_URL: postgresql://gigshield:password@postgres:5432/gigshield
+      REDIS_URL: redis://redis:6379
+      ML_SERVICE_URL: http://ml-service:8000
+    volumes:
+      - ../backend:/app
+      - /app/node_modules
+
+  ml-service:
+    build:
+      context: ../ml-service
+      dockerfile: Dockerfile
+    container_name: gigshield_ml
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    depends_on:
+      redis:
+        condition: service_healthy
+    env_file:
+      - ../.env
+    environment:
+      REDIS_URL: redis://redis:6379
+    volumes:
+      - ../ml-service:/app
+
+  frontend:
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile.dev
+    container_name: gigshield_frontend
+    restart: unless-stopped
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+    environment:
+      VITE_API_URL: http://localhost:3001
+      VITE_FIREBASE_PROJECT_ID: ${FIREBASE_PROJECT_ID}
+      VITE_FIREBASE_WEB_API_KEY: ${FIREBASE_WEB_API_KEY}
+    volumes:
+      - ../frontend:/app
+      - /app/node_modules
+
+volumes:
+  postgres_data:
+  redis_data:
